@@ -33,7 +33,11 @@ passport.use(new GoogleStrategy({
       }
     }
 
-    return done(null, user);
+    return done(null, {
+  id: user._id.toString(),
+  role: user.role,
+  email: user.email,
+});
   } catch (err) {
     return done(err);
   }

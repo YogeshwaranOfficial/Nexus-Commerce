@@ -5,13 +5,12 @@ import crypto from 'crypto';
 import Order from '../models/Order.model';
 import { AppError } from '../utils/AppError';
 import { asyncHandler } from '../middleware/asyncHandler';
-import { AuthRequest } from '../middleware/auth.middleware';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2023-10-16' });
 const razorpay = new Razorpay({ key_id: process.env.RAZORPAY_KEY_ID!, key_secret: process.env.RAZORPAY_KEY_SECRET! });
 
 // ─── Create Stripe Payment Intent ────────────────────────
-export const createStripePaymentIntent = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const createStripePaymentIntent = asyncHandler(async (req: Request, res: Response) => {
   const { orderId } = req.body;
 
   const order = await Order.findOne({ _id: orderId, user: req.user!.id });
@@ -82,7 +81,7 @@ export const stripeWebhook = asyncHandler(async (req: Request, res: Response) =>
 });
 
 // ─── Create Razorpay Order ────────────────────────────────
-export const createRazorpayOrder = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const createRazorpayOrder = asyncHandler(async (req: Request, res: Response) => {
   const { orderId } = req.body;
 
   const order = await Order.findOne({ _id: orderId, user: req.user!.id });
@@ -110,7 +109,7 @@ export const createRazorpayOrder = asyncHandler(async (req: AuthRequest, res: Re
 });
 
 // ─── Verify Razorpay Payment ──────────────────────────────
-export const verifyRazorpayPayment = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const verifyRazorpayPayment = asyncHandler(async (req: Request, res: Response) => {
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature, orderId } = req.body;
 
   const expectedSignature = crypto

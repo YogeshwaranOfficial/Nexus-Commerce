@@ -3,10 +3,9 @@ import { Cart, Coupon } from '../models/index';
 import Product from '../models/Product.model';
 import { AppError } from '../utils/AppError';
 import { asyncHandler } from '../middleware/asyncHandler';
-import { AuthRequest } from '../middleware/auth.middleware';
 
 // ─── GET /cart ────────────────────────────────────────────
-export const getCart = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const getCart = asyncHandler(async (req: Request, res: Response) => {
   const cart = await Cart.findOne({ user: req.user!.id })
     .populate({
       path: 'items.product',
@@ -32,7 +31,7 @@ export const getCart = asyncHandler(async (req: AuthRequest, res: Response) => {
 });
 
 // ─── POST /cart ───────────────────────────────────────────
-export const addToCart = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const addToCart = asyncHandler(async (req: Request, res: Response) => {
   const { productId, variantId, quantity = 1 } = req.body;
 
   const product = await Product.findOne({ _id: productId, isPublished: true });
@@ -98,18 +97,22 @@ export const addToCart = asyncHandler(async (req: AuthRequest, res: Response) =>
 });
 
 // ─── PATCH /cart/:itemId ──────────────────────────────────
-export const updateCartItem = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const updateCartItem = asyncHandler(async (req: Request, res: Response) => {
   const { quantity } = req.body;
   const { itemId } = req.params;
 
   const cart = await Cart.findOne({ user: req.user!.id });
   if (!cart) throw new AppError('Cart not found', 404);
 
-  const item = cart.items.id(itemId);
+  const item = cart.items.find(
+  (item) => item._id?.toString() === itemId
+  );
   if (!item) throw new AppError('Item not found in cart', 404);
 
   if (quantity <= 0) {
-    cart.items.pull(itemId);
+   const item = cart.items.find(
+  (item) => item._id?.toString() === itemId
+);
   } else {
     // Validate stock
     const product = await Product.findById(item.product).select('stock variants');
@@ -129,18 +132,21 @@ export const updateCartItem = asyncHandler(async (req: AuthRequest, res: Respons
 });
 
 // ─── DELETE /cart/:itemId ─────────────────────────────────
-export const removeCartItem = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const removeCartItem = asyncHandler(async (req: Request, res: Response) => {
   const cart = await Cart.findOne({ user: req.user!.id });
   if (!cart) throw new AppError('Cart not found', 404);
 
-  cart.items.pull(req.params.itemId);
+
+  cart.items = cart.items.filter(
+  (item) => item._id?.toString() !== req.params.itemId
+);
   await cart.save();
 
   res.json({ success: true, data: { cart } });
 });
 
 // ─── DELETE /cart ─────────────────────────────────────────
-export const clearCart = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const clearCart = asyncHandler(async (req: Request, res: Response) => {
   await Cart.findOneAndUpdate(
     { user: req.user!.id },
     { items: [], couponCode: undefined, couponDiscount: 0 },
@@ -149,7 +155,7 @@ export const clearCart = asyncHandler(async (req: AuthRequest, res: Response) =>
 });
 
 // ─── POST /cart/coupon ────────────────────────────────────
-export const applyCoupon = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const applyCoupon = asyncHandler(async (req: Request, res: Response) => {
   const { code } = req.body;
 
   const cart = await Cart.findOne({ user: req.user!.id });
@@ -199,7 +205,7 @@ export const applyCoupon = asyncHandler(async (req: AuthRequest, res: Response) 
 });
 
 // ─── DELETE /cart/coupon ──────────────────────────────────
-export const removeCoupon = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const removeCoupon = asyncHandler(async (req: Request, res: Response) => {
   await Cart.findOneAndUpdate(
     { user: req.user!.id },
     { couponCode: undefined, couponDiscount: 0 },

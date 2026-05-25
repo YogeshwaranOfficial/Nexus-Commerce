@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { Category } from '../models/index';
 import { AppError } from '../utils/AppError';
 import { asyncHandler } from '../middleware/asyncHandler';
-import { AuthRequest } from '../middleware/auth.middleware';
 import { slugify } from '../utils/slugify';
 
 // ─── GET /categories ──────────────────────────────────────
@@ -24,7 +23,7 @@ export const getCategoryBySlug = asyncHandler(async (req: Request, res: Response
 });
 
 // ─── POST /categories (admin) ─────────────────────────────
-export const createCategory = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const createCategory = asyncHandler(async (req: Request, res: Response) => {
   const { name, description, parentId, image, sortOrder } = req.body;
 
   const slug = slugify(name);
@@ -52,7 +51,7 @@ export const createCategory = asyncHandler(async (req: AuthRequest, res: Respons
 });
 
 // ─── PATCH /categories/:id (admin) ───────────────────────
-export const updateCategory = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const updateCategory = asyncHandler(async (req: Request, res: Response) => {
   const category = await Category.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
@@ -62,7 +61,7 @@ export const updateCategory = asyncHandler(async (req: AuthRequest, res: Respons
 });
 
 // ─── DELETE /categories/:id (admin) ──────────────────────
-export const deleteCategory = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const deleteCategory = asyncHandler(async (req: Request, res: Response) => {
   const category = await Category.findByIdAndUpdate(req.params.id, { isActive: false }, { new: true });
   if (!category) throw new AppError('Category not found', 404);
   res.json({ success: true, message: 'Category deactivated' });

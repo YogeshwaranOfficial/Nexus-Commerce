@@ -6,7 +6,7 @@ import Order from '../models/Order.model';
 import { Review, Coupon } from '../models/index';
 import { AppError } from '../utils/AppError';
 import { asyncHandler } from '../middleware/asyncHandler';
-import { AuthRequest } from '../middleware/auth.middleware';
+
 
 // ─── GET /admin/dashboard ─────────────────────────────────
 export const getDashboard = asyncHandler(async (_req: Request, res: Response) => {
@@ -146,7 +146,7 @@ export const getRevenueBreakdown = asyncHandler(async (req: Request, res: Respon
           as: 'category',
         },
       },
-      { $unwind: { path: '$category', preserveNullAndEmpty: true } },
+      { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } },
       {
         $group: {
           _id: { catId: '$category._id', catName: '$category.name' },
@@ -205,7 +205,7 @@ export const getUsers = asyncHandler(async (req: Request, res: Response) => {
 });
 
 // ─── PATCH /admin/users/:id ───────────────────────────────
-export const updateUser = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const updateUser = asyncHandler(async (req: Request, res: Response) => {
   const { role, isActive } = req.body;
   const updates: Record<string, unknown> = {};
   if (role) updates.role = role;
@@ -272,7 +272,7 @@ export const getAdminProducts = asyncHandler(async (req: Request, res: Response)
 });
 
 // ─── PATCH /admin/products/:id/publish ───────────────────
-export const togglePublish = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const togglePublish = asyncHandler(async (req: Request, res: Response) => {
   const product = await Product.findByIdAndUpdate(
     req.params.id,
     [{ $set: { isPublished: { $not: '$isPublished' } } }],

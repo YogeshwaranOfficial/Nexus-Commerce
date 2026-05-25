@@ -1,12 +1,11 @@
-import { Response } from 'express';
+import { Request , Response } from 'express';
 import { Notification } from '../models/index';
 import { AppError } from '../utils/AppError';
 import { asyncHandler } from '../middleware/asyncHandler';
-import { AuthRequest } from '../middleware/auth.middleware';
 import { emitToUser } from '../config/socket';
 
 // ─── GET /notifications ───────────────────────────────────
-export const getNotifications = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const getNotifications = asyncHandler(async (req: Request, res: Response) => {
   const { page = 1, limit = 20, unreadOnly } = req.query;
   const filter: Record<string, unknown> = { user: req.user!.id };
   if (unreadOnly === 'true') filter.isRead = false;
@@ -31,7 +30,7 @@ export const getNotifications = asyncHandler(async (req: AuthRequest, res: Respo
 });
 
 // ─── PATCH /notifications/:id/read ───────────────────────
-export const markAsRead = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const markAsRead = asyncHandler(async (req: Request, res: Response) => {
   await Notification.findOneAndUpdate(
     { _id: req.params.id, user: req.user!.id },
     { isRead: true },
@@ -40,13 +39,13 @@ export const markAsRead = asyncHandler(async (req: AuthRequest, res: Response) =
 });
 
 // ─── PATCH /notifications/read-all ───────────────────────
-export const markAllAsRead = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const markAllAsRead = asyncHandler(async (req: Request, res: Response) => {
   await Notification.updateMany({ user: req.user!.id, isRead: false }, { isRead: true });
   res.json({ success: true });
 });
 
 // ─── DELETE /notifications/:id ────────────────────────────
-export const deleteNotification = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const deleteNotification = asyncHandler(async (req: Request, res: Response) => {
   await Notification.findOneAndDelete({ _id: req.params.id, user: req.user!.id });
   res.json({ success: true });
 });

@@ -79,6 +79,7 @@ export const Review: Model<IReview> = mongoose.model<IReview>('Review', ReviewSc
 // models/Cart.model.ts
 // ─────────────────────────────────────────────────────────
 export interface ICartItem {
+  _id?: mongoose.Types.ObjectId;
   product: mongoose.Types.ObjectId;
   variantId?: string;
   quantity: number;

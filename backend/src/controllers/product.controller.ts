@@ -3,7 +3,6 @@ import mongoose from 'mongoose';
 import Product from '../models/Product.model';
 import { AppError } from '../utils/AppError';
 import { asyncHandler } from '../middleware/asyncHandler';
-import { AuthRequest } from '../middleware/auth.middleware';
 import { emitInventoryUpdate } from '../config/socket';
 import { slugify } from '../utils/slugify';
 
@@ -105,7 +104,7 @@ export const getProduct = asyncHandler(async (req: Request, res: Response) => {
 });
 
 // ─── POST /products (seller/admin) ───────────────────────
-export const createProduct = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const createProduct = asyncHandler(async (req: Request, res: Response) => {
   const data = req.body;
 
   // Generate unique slug
@@ -124,7 +123,7 @@ export const createProduct = asyncHandler(async (req: AuthRequest, res: Response
 });
 
 // ─── PATCH /products/:id (seller/admin) ──────────────────
-export const updateProduct = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const updateProduct = asyncHandler(async (req: Request, res: Response) => {
   const product = await Product.findById(req.params.id);
   if (!product) throw new AppError('Product not found', 404);
 
@@ -147,7 +146,7 @@ export const updateProduct = asyncHandler(async (req: AuthRequest, res: Response
 });
 
 // ─── DELETE /products/:id (seller/admin) ─────────────────
-export const deleteProduct = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const deleteProduct = asyncHandler(async (req: Request, res: Response) => {
   const product = await Product.findById(req.params.id);
   if (!product) throw new AppError('Product not found', 404);
 

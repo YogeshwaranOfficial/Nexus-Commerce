@@ -2,17 +2,16 @@ import { Request, Response } from 'express';
 import User from '../models/User.model';
 import { AppError } from '../utils/AppError';
 import { asyncHandler } from '../middleware/asyncHandler';
-import { AuthRequest } from '../middleware/auth.middleware';
 
 // ─── GET /users/profile ───────────────────────────────────
-export const getProfile = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const getProfile = asyncHandler(async (req: Request, res: Response) => {
   const user = await User.findById(req.user!.id);
   if (!user) throw new AppError('User not found', 404);
   res.json({ success: true, data: { user: user.toSafeJSON() } });
 });
 
 // ─── PATCH /users/profile ─────────────────────────────────
-export const updateProfile = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const updateProfile = asyncHandler(async (req: Request, res: Response) => {
   const allowed = ['name', 'phone', 'preferences'];
   const updates: Record<string, unknown> = {};
   allowed.forEach((key) => { if (req.body[key] !== undefined) updates[key] = req.body[key]; });
@@ -24,14 +23,14 @@ export const updateProfile = asyncHandler(async (req: AuthRequest, res: Response
 });
 
 // ─── PATCH /users/avatar ──────────────────────────────────
-export const updateAvatar = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const updateAvatar = asyncHandler(async (req: Request, res: Response) => {
   if (!req.body.avatarUrl) throw new AppError('Avatar URL required', 400);
   const user = await User.findByIdAndUpdate(req.user!.id, { avatar: req.body.avatarUrl }, { new: true });
   res.json({ success: true, data: { avatar: user?.avatar } });
 });
 
 // ─── PATCH /users/password ────────────────────────────────
-export const changePassword = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const changePassword = asyncHandler(async (req: Request, res: Response) => {
   const { currentPassword, newPassword } = req.body;
   const user = await User.findById(req.user!.id).select('+password');
   if (!user) throw new AppError('User not found', 404);
@@ -48,13 +47,13 @@ export const changePassword = asyncHandler(async (req: AuthRequest, res: Respons
 });
 
 // ─── GET /users/addresses ─────────────────────────────────
-export const getAddresses = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const getAddresses = asyncHandler(async (req: Request, res: Response) => {
   const user = await User.findById(req.user!.id).select('addresses');
   res.json({ success: true, data: { addresses: user?.addresses || [] } });
 });
 
 // ─── POST /users/addresses ────────────────────────────────
-export const addAddress = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const addAddress = asyncHandler(async (req: Request, res: Response) => {
   const user = await User.findById(req.user!.id);
   if (!user) throw new AppError('User not found', 404);
 
@@ -73,11 +72,13 @@ export const addAddress = asyncHandler(async (req: AuthRequest, res: Response) =
 });
 
 // ─── PATCH /users/addresses/:addressId ───────────────────
-export const updateAddress = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const updateAddress = asyncHandler(async (req: Request, res: Response) => {
   const user = await User.findById(req.user!.id);
   if (!user) throw new AppError('User not found', 404);
 
-  const address = user.addresses.id(req.params.addressId);
+  const address = user.addresses.find(
+  (item) => item._id?.toString() === req.params.addressId
+)
   if (!address) throw new AppError('Address not found', 404);
 
   if (req.body.isDefault) {
@@ -91,26 +92,42 @@ export const updateAddress = asyncHandler(async (req: AuthRequest, res: Response
 });
 
 // ─── DELETE /users/addresses/:addressId ──────────────────
-export const deleteAddress = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const deleteAddress = asyncHandler(async (req: Request, res: Response) => {
   const user = await User.findById(req.user!.id);
-  if (!user) throw new AppError('User not found', 404);
 
-  const addr = user.addresses.id(req.params.addressId);
-  if (!addr) throw new AppError('Address not found', 404);
+  if (!user) {
+    throw new AppError('User not found', 404);
+  }
 
-  user.addresses.pull(req.params.addressId);
+  const addressId = req.params.addressId;
 
-  // If deleted was default, make first remaining default
+  const addr = user.addresses.find(
+    (item) => item._id?.toString() === addressId
+  );
+
+  if (!addr) {
+    throw new AppError('Address not found', 404);
+  }
+
+  user.addresses = user.addresses.filter(
+    (item) => item._id?.toString() !== addressId
+  );
+
+  // If deleted address was default, make first remaining address default
   if (addr.isDefault && user.addresses.length > 0) {
     user.addresses[0].isDefault = true;
   }
 
   await user.save();
-  res.json({ success: true, data: { addresses: user.addresses } });
+
+  res.json({
+    success: true,
+    data: { addresses: user.addresses },
+  });
 });
 
 // ─── PATCH /users/addresses/:addressId/default ───────────
-export const setDefaultAddress = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const setDefaultAddress = asyncHandler(async (req: Request, res: Response) => {
   const user = await User.findById(req.user!.id);
   if (!user) throw new AppError('User not found', 404);
 

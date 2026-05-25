@@ -3,7 +3,6 @@ import { v2 as cloudinary } from 'cloudinary';
 import multer from 'multer';
 import { AppError } from '../utils/AppError';
 import { asyncHandler } from '../middleware/asyncHandler';
-import { AuthRequest } from '../middleware/auth.middleware';
 
 // ─── Cloudinary config ────────────────────────────────────
 cloudinary.config({
@@ -53,7 +52,7 @@ async function uploadToCloudinary(
 }
 
 // ─── POST /upload/products ────────────────────────────────
-export const uploadProductImages = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const uploadProductImages = asyncHandler(async (req: Request, res: Response) => {
   if (!req.files || (req.files as Express.Multer.File[]).length === 0) {
     throw new AppError('No files uploaded', 400);
   }
@@ -67,7 +66,7 @@ export const uploadProductImages = asyncHandler(async (req: AuthRequest, res: Re
 });
 
 // ─── POST /upload/avatar ──────────────────────────────────
-export const uploadAvatar = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const uploadAvatar = asyncHandler(async (req: Request, res: Response) => {
   if (!req.file) throw new AppError('No file uploaded', 400);
 
   const result = await uploadToCloudinary(req.file.buffer, 'avatars', {
@@ -82,7 +81,7 @@ export const uploadAvatar = asyncHandler(async (req: AuthRequest, res: Response)
 });
 
 // ─── POST /upload/category ────────────────────────────────
-export const uploadCategoryImage = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const uploadCategoryImage = asyncHandler(async (req: Request, res: Response) => {
   if (!req.file) throw new AppError('No file uploaded', 400);
 
   const result = await uploadToCloudinary(req.file.buffer, 'categories', {
@@ -93,7 +92,7 @@ export const uploadCategoryImage = asyncHandler(async (req: AuthRequest, res: Re
 });
 
 // ─── DELETE /upload ───────────────────────────────────────
-export const deleteUpload = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const deleteUpload = asyncHandler(async (req: Request, res: Response) => {
   const { publicId } = req.body;
   if (!publicId) throw new AppError('Public ID required', 400);
 

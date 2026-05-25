@@ -4,10 +4,9 @@ import Order from '../models/Order.model';
 import { Review } from '../models/index';
 import { AppError } from '../utils/AppError';
 import { asyncHandler } from '../middleware/asyncHandler';
-import { AuthRequest } from '../middleware/auth.middleware';
 
 // ─── GET /seller/dashboard ────────────────────────────────
-export const getSellerDashboard = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const getSellerDashboard = asyncHandler(async (req: Request, res: Response) => {
   const sellerId = req.user!.id;
   const thisMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 
@@ -70,7 +69,7 @@ export const getSellerDashboard = asyncHandler(async (req: AuthRequest, res: Res
 });
 
 // ─── GET /seller/products ─────────────────────────────────
-export const getSellerProducts = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const getSellerProducts = asyncHandler(async (req: Request, res: Response) => {
   const { page = 1, limit = 20, isPublished, search } = req.query;
   const filter: Record<string, unknown> = { seller: req.user!.id };
   if (isPublished !== undefined) filter.isPublished = isPublished === 'true';
@@ -93,7 +92,7 @@ export const getSellerProducts = asyncHandler(async (req: AuthRequest, res: Resp
 });
 
 // ─── GET /seller/orders ───────────────────────────────────
-export const getSellerOrders = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const getSellerOrders = asyncHandler(async (req: Request, res: Response) => {
   const { page = 1, limit = 20, status } = req.query;
   const filter: Record<string, unknown> = { 'items.seller': req.user!.id };
   if (status) filter.status = status;
@@ -124,7 +123,7 @@ export const getSellerOrders = asyncHandler(async (req: AuthRequest, res: Respon
 });
 
 // ─── GET /seller/analytics ────────────────────────────────
-export const getSellerAnalytics = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const getSellerAnalytics = asyncHandler(async (req: Request, res: Response) => {
   const { period = '30d' } = req.query;
   const days = period === '7d' ? 7 : period === '90d' ? 90 : 30;
   const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
@@ -148,7 +147,7 @@ export const getSellerAnalytics = asyncHandler(async (req: AuthRequest, res: Res
 });
 
 // ─── PATCH /seller/products/:id/inventory ────────────────
-export const updateInventory = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const updateInventory = asyncHandler(async (req: Request, res: Response) => {
   const { stock, variantUpdates } = req.body;
   const product = await Product.findOne({ _id: req.params.id, seller: req.user!.id });
   if (!product) throw new AppError('Product not found', 404);

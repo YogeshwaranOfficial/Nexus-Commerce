@@ -5,7 +5,6 @@ import Product from '../models/Product.model';
 import Order from '../models/Order.model';
 import { AppError } from '../utils/AppError';
 import { asyncHandler } from '../middleware/asyncHandler';
-import { AuthRequest } from '../middleware/auth.middleware';
 
 // ─── GET /reviews/product/:productId ─────────────────────
 export const getProductReviews = asyncHandler(async (req: Request, res: Response) => {
@@ -45,7 +44,7 @@ export const getProductReviews = asyncHandler(async (req: Request, res: Response
 });
 
 // ─── POST /reviews ────────────────────────────────────────
-export const createReview = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const createReview = asyncHandler(async (req: Request, res: Response) => {
   const { productId, orderId, rating, title, body } = req.body;
 
   // Must have purchased the product
@@ -80,7 +79,7 @@ export const createReview = asyncHandler(async (req: AuthRequest, res: Response)
 });
 
 // ─── PATCH /reviews/:id ───────────────────────────────────
-export const updateReview = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const updateReview = asyncHandler(async (req: Request, res: Response) => {
   const review = await Review.findOne({ _id: req.params.id, user: req.user!.id });
   if (!review) throw new AppError('Review not found', 404);
 
@@ -96,7 +95,7 @@ export const updateReview = asyncHandler(async (req: AuthRequest, res: Response)
 });
 
 // ─── DELETE /reviews/:id ──────────────────────────────────
-export const deleteReview = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const deleteReview = asyncHandler(async (req: Request, res: Response) => {
   const filter: Record<string, unknown> = { _id: req.params.id };
   if (req.user!.role !== 'admin') filter.user = req.user!.id;
 
@@ -108,7 +107,7 @@ export const deleteReview = asyncHandler(async (req: AuthRequest, res: Response)
 });
 
 // ─── POST /reviews/:id/helpful ────────────────────────────
-export const markHelpful = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const markHelpful = asyncHandler(async (req: Request, res: Response) => {
   const review = await Review.findById(req.params.id);
   if (!review) throw new AppError('Review not found', 404);
 
@@ -126,7 +125,7 @@ export const markHelpful = asyncHandler(async (req: AuthRequest, res: Response) 
 });
 
 // ─── PATCH /reviews/:id/reply (seller) ───────────────────
-export const replyToReview = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const replyToReview = asyncHandler(async (req: Request, res: Response) => {
   const review = await Review.findById(req.params.id).populate('product', 'seller');
   if (!review) throw new AppError('Review not found', 404);
 

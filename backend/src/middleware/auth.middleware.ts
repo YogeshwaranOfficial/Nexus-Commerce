@@ -4,16 +4,9 @@ import { AppError } from '../utils/AppError';
 import { asyncHandler } from './asyncHandler';
 import User, { UserRole } from '../models/User.model';
 
-export interface AuthRequest extends Request {
-  user?: {
-    id: string;
-    role: UserRole;
-    email: string;
-  };
-}
 
 // ─── Protect: verify JWT ──────────────────────────────────
-export const protect = asyncHandler(async (req: AuthRequest, _res: Response, next: NextFunction) => {
+export const protect = asyncHandler(async (req: Request, _res: Response, next: NextFunction) => {
   let token: string | undefined;
 
   if (req.headers.authorization?.startsWith('Bearer ')) {
@@ -30,7 +23,7 @@ export const protect = asyncHandler(async (req: AuthRequest, _res: Response, nex
 
 // ─── Require roles ────────────────────────────────────────
 export const requireRoles = (...roles: UserRole[]) =>
-  (req: AuthRequest, _res: Response, next: NextFunction) => {
+  (req: Request, _res: Response, next: NextFunction) => {
     if (!req.user) throw new AppError('Authentication required', 401);
     if (!roles.includes(req.user.role)) {
       throw new AppError('You do not have permission to perform this action', 403);
@@ -39,7 +32,7 @@ export const requireRoles = (...roles: UserRole[]) =>
   };
 
 // ─── Optional auth (for guest-accessible endpoints) ───────
-export const optionalAuth = asyncHandler(async (req: AuthRequest, _res: Response, next: NextFunction) => {
+export const optionalAuth = asyncHandler(async (req: Request, _res: Response, next: NextFunction) => {
   let token: string | undefined;
 
   if (req.headers.authorization?.startsWith('Bearer ')) {

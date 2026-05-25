@@ -5,7 +5,6 @@ import Product from '../models/Product.model';
 import User from '../models/User.model';
 import { AppError } from '../utils/AppError';
 import { asyncHandler } from '../middleware/asyncHandler';
-import { AuthRequest } from '../middleware/auth.middleware';
 import { emitToUser, emitToAdmin, emitOrderUpdate } from '../config/socket';
 import { EmailService } from '../services/email.service';
 
@@ -14,7 +13,7 @@ const FREE_SHIPPING_THRESHOLD = 999; // ₹999
 const SHIPPING_FEE = 99; // ₹99
 
 // ─── GET /orders (user's orders) ─────────────────────────
-export const getMyOrders = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const getMyOrders = asyncHandler(async (req: Request, res: Response) => {
   const { page = 1, limit = 10, status } = req.query;
   const filter: Record<string, unknown> = { user: req.user!.id };
   if (status) filter.status = status;
@@ -35,7 +34,7 @@ export const getMyOrders = asyncHandler(async (req: AuthRequest, res: Response) 
 });
 
 // ─── GET /orders/:id ──────────────────────────────────────
-export const getOrder = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const getOrder = asyncHandler(async (req: Request, res: Response) => {
   const order = await Order.findById(req.params.id).populate('items.product', 'name images slug');
 
   if (!order) throw new AppError('Order not found', 404);
@@ -47,7 +46,7 @@ export const getOrder = asyncHandler(async (req: AuthRequest, res: Response) => 
 });
 
 // ─── POST /orders/checkout ────────────────────────────────
-export const checkout = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const checkout = asyncHandler(async (req: Request, res: Response) => {
   const { addressId, paymentMethod, couponCode, walletAmount = 0 } = req.body;
 
   // 1. Fetch cart
@@ -183,7 +182,7 @@ export const checkout = asyncHandler(async (req: AuthRequest, res: Response) => 
 });
 
 // ─── PATCH /orders/:id/status (admin/seller) ─────────────
-export const updateOrderStatus = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const updateOrderStatus = asyncHandler(async (req: Request, res: Response) => {
   const { status, message, location } = req.body;
   const order = await Order.findById(req.params.id);
   if (!order) throw new AppError('Order not found', 404);
@@ -205,7 +204,7 @@ export const updateOrderStatus = asyncHandler(async (req: AuthRequest, res: Resp
 });
 
 // ─── POST /orders/:id/cancel ──────────────────────────────
-export const cancelOrder = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const cancelOrder = asyncHandler(async (req: Request, res: Response) => {
   const order = await Order.findOne({ _id: req.params.id, user: req.user!.id });
   if (!order) throw new AppError('Order not found', 404);
 

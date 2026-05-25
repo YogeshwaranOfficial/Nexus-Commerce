@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import mongoose, { Document, Schema, Model } from 'mongoose';
 
 export interface IProductImage {
@@ -7,6 +8,7 @@ export interface IProductImage {
 }
 
 export interface IVariant {
+  _id?: Types.ObjectId;
   sku: string;
   name: string; // e.g. "Red / XL"
   attributes: Record<string, string>; // { color: 'Red', size: 'XL' }
