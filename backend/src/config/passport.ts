@@ -3,6 +3,10 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { Strategy as GitHubStrategy } from 'passport-github2';
 import User from '../models/User.model';
 
+if (
+  process.env.GOOGLE_CLIENT_ID &&
+  process.env.GOOGLE_CLIENT_SECRET
+) { 
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID!,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
@@ -33,8 +37,15 @@ passport.use(new GoogleStrategy({
   } catch (err) {
     return done(err);
   }
-}));
+}
+));}
 
+
+
+if (
+  process.env.GITHUB_CLIENT_ID &&
+  process.env.GITHUB_CLIENT_SECRET
+) {
 passport.use(new GitHubStrategy({
   clientID: process.env.GITHUB_CLIENT_ID!,
   clientSecret: process.env.GITHUB_CLIENT_SECRET!,
@@ -66,4 +77,4 @@ passport.use(new GitHubStrategy({
   } catch (err) {
     return done(err);
   }
-}));
+}));}
