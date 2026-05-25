@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+# Block admin and API paths from indexing
+Disallow: /admin
+Disallow: /seller
+Disallow: /account
+Disallow: /checkout
+Disallow: /cart
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://your-nexus-domain.com/sitemap.xml

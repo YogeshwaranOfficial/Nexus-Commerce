@@ -1,0 +1,158 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── CSS Variables ──────────────────────────────────────── */
+:root {
+  --surface: #ffffff;
+  --surface-card: #f9f9fc;
+  --surface-border: #e8e8f0;
+  --ink: #0f0f15;
+  --ink-secondary: #52526a;
+  --ink-muted: #9999b3;
+  --brand: #6366f1;
+  --brand-dark: #4f46e5;
+  --accent: #8b5cf6;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+}
+
+.dark {
+  --surface: #0d0d12;
+  --surface-card: #13131a;
+  --surface-border: #1e1e2e;
+  --ink: #f1f1f9;
+  --ink-secondary: #9999b3;
+  --ink-muted: #52526a;
+}
+
+/* ─── Base ────────────────────────────────────────────────── */
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-white dark:bg-[#0d0d12] text-ink dark:text-ink-dark;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight;
+  }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { @apply bg-transparent; }
+  ::-webkit-scrollbar-thumb { @apply bg-surface-border dark:bg-surface-border-dark rounded-full; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-brand-300; }
+
+  ::selection { @apply bg-brand-500/20 text-brand-700; }
+}
+
+/* ─── Components ─────────────────────────────────────────── */
+@layer components {
+  /* Skeleton loader */
+  .skeleton {
+    @apply relative overflow-hidden bg-surface-card dark:bg-surface-card-dark rounded-lg;
+  }
+  .skeleton::after {
+    content: '';
+    @apply absolute inset-0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.05) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s linear infinite;
+  }
+  .dark .skeleton::after {
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 50%, transparent 100%);
+    background-size: 200% 100%;
+  }
+
+  /* Glass card */
+  .glass {
+    @apply backdrop-blur-xl bg-white/80 dark:bg-[#13131a]/80 border border-white/20 dark:border-white/5;
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-brand-500 via-accent-500 to-brand-600 bg-clip-text text-transparent;
+  }
+
+  /* Mesh background */
+  .mesh-bg {
+    background-image: radial-gradient(at 40% 20%, rgba(99,102,241,0.12) 0px, transparent 50%),
+      radial-gradient(at 80% 0%, rgba(139,92,246,0.08) 0px, transparent 50%),
+      radial-gradient(at 0% 50%, rgba(99,102,241,0.06) 0px, transparent 50%);
+  }
+
+  /* Focus ring */
+  .focus-ring {
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-[#0d0d12];
+  }
+
+  /* Btn primary */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white
+      bg-gradient-to-r from-brand-500 to-accent-500 hover:from-brand-600 hover:to-accent-600
+      shadow-glow hover:shadow-glow-lg transition-all duration-200 active:scale-[0.98] focus-ring;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold
+      bg-surface-card dark:bg-surface-card-dark border border-surface-border dark:border-surface-border-dark
+      hover:bg-brand-50 dark:hover:bg-brand-950/30 hover:border-brand-200 dark:hover:border-brand-800
+      text-ink dark:text-ink-dark transition-all duration-200 active:scale-[0.98] focus-ring;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium
+      hover:bg-surface-card dark:hover:bg-surface-card-dark text-ink-secondary dark:text-ink-secondary-dark
+      transition-all duration-150 active:scale-[0.97] focus-ring;
+  }
+
+  /* Card */
+  .card {
+    @apply bg-white dark:bg-surface-card-dark border border-surface-border dark:border-surface-border-dark
+      rounded-2xl shadow-card dark:shadow-card-dark transition-shadow duration-200;
+  }
+
+  .card-hover {
+    @apply card hover:shadow-card-hover dark:hover:shadow-card-hover-dark hover:-translate-y-0.5 transition-all duration-200;
+  }
+
+  /* Input */
+  .input {
+    @apply w-full px-4 py-3 rounded-xl border border-surface-border dark:border-surface-border-dark
+      bg-white dark:bg-surface-card-dark text-ink dark:text-ink-dark placeholder:text-ink-muted dark:placeholder:text-ink-muted-dark
+      focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500
+      transition-all duration-150 text-sm;
+  }
+
+  /* Badge */
+  .badge {
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold;
+  }
+
+  /* Price display */
+  .price { @apply font-bold text-ink dark:text-ink-dark; }
+  .price-original { @apply text-ink-muted dark:text-ink-muted-dark line-through text-sm; }
+  .price-badge { @apply badge bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400; }
+}
+
+/* ─── Swiper overrides ───────────────────────────────────── */
+.swiper-pagination-bullet {
+  @apply bg-surface-border dark:bg-surface-border-dark opacity-100;
+}
+.swiper-pagination-bullet-active {
+  @apply bg-brand-500;
+}
+
+/* ─── Page transition ────────────────────────────────────── */
+.page-enter { opacity: 0; transform: translateY(8px); }
+.page-enter-active { opacity: 1; transform: translateY(0); transition: all 0.25s ease-out; }
