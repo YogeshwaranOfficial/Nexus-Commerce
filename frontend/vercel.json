@@ -30,8 +30,5 @@
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
       ]
     }
-  ],
-  "env": {
-    "VITE_API_URL": "@nexus_api_url"
-  }
+  ]
 }
