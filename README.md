@@ -8,8 +8,8 @@ A modern, full-stack, production-ready e-commerce platform built using the MERN 
 
 | Service                  | URL                                                                                                   |
 | ------------------------ | ----------------------------------------------------------------------------------------------------- |
-| **Frontend (Vercel)**    | [Nexus Commerce Frontend](https://nexus-commerce-2026.vercel.app/?utm_source=chatgpt.com)             |
-| **Backend API (Render)** | [Nexus Commerce Backend API](https://nexus-commerce-backend-yhqp.onrender.com?utm_source=chatgpt.com) |
+| **Frontend (Vercel)**    | [Nexus Commerce Frontend](https://nexus-commerce-2026.vercel.app/)             |
+| **Backend API (Render)** | [Nexus Commerce Backend API](https://nexus-commerce-backend-yhqp.onrender.com) |
 
 ---
 
