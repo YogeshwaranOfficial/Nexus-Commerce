@@ -58,6 +58,17 @@ app.use(
   })
 );
 
+app.get('/', (_req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Nexus Commerce API is running successfully',
+  });
+});
+
+app.head('/', (_req, res) => {
+  res.sendStatus(200);
+});
+
 // Global rate limit
 app.use(rateLimit({
   windowMs: 15 * 60 * 1000, // 15 min
